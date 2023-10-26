@@ -46,7 +46,7 @@ void tokeniseRecord(const char *input, const char *delimiter,
 
 int main() {
     char record[21] = "2023-09-01,07:30,300";
-    char data[11];
+    char date[11];
     char time[6];
     char steps[10];  // Large enough to hold a typical step count as a string
 
@@ -60,9 +60,33 @@ int stepsint;
     
     int buffer_size = 1024;
     char line_buffer[buffer_size];
-   while (fgets(line_buffer, buffer_size, file) != NULL) {
-        printf("%s",line_buffer);
+     int line_count = 0;
+    while (fgets(line_buffer, buffer_size, file) != NULL) {
+        if (line_count >= 3) {
+            break;
+        }
+        printf("%s", line_buffer);
+        tokeniseRecord(line_buffer, ",", date, time, steps);
+        printf("%s/%s/%s\n", date, time, steps);
+        line_count++;
     }
     fclose(file);
     return 0;
+
+    FILE *fp = fopen("output.txt", "w");
+    if (file == NULL) {
+        perror("");
+        return 1;
+    }
+
+    int number, num_lines = 3;
+    printf("Type %d numbers: ", num_lines);
+    for (int i = 0; i < num_lines; i++) {
+        scanf("%d", &number);
+        fprintf(file, "%d\n", number);
+    }
+
+    fclose(file);
+    return 0;
 }
+

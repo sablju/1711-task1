@@ -2,13 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Define an appropriate struct
-typedef struct {
-	char date[11];
-	char time[6];
-	char steps[10];  // Changed back to char[]
-} FITNESS_DATA;
-
 // Define any additional variables here
 
 
@@ -45,10 +38,17 @@ void tokeniseRecord(const char *input, const char *delimiter,
 // Complete the main function
 
 int main() {
+// Define an appropriate struct
+typedef struct {
+	char date[11];
+	char time[6];
+	char steps[10];  // Changed back to char[]
+} FITNESS_DATA;
+    
     char record[21] = "2023-09-01,07:30,300";
     char date[11];
     char time[6];
-    int steps[10];  // Large enough to hold a typical step count as a string
+    char steps[10];  // Large enough to hold a typical step count as a string
 
 int stepsint;
     char filename[] = "FitnessData_2023.csv";
@@ -66,26 +66,21 @@ while (fgets(line_buffer, buffer_size, file) != NULL) {
         break;
     }
     tokeniseRecord(line_buffer, ",", date, time, steps);
-    printf("%s/%s/%d", date, time, steps);
+    printf("%s/%s/%s", date, time, steps);
     line_count++;
 }
-    fclose(file);
-    return 0;
-
-    FILE *fp = fopen("output.txt", "w");
-    if (file == NULL) {
-        perror("");
-        return 1;
+  rewind(file);  // Reset the file pointer to the beginning of the file
+    
+    int count = 0;
+    int a;
+    while((a = fgetc(file)) != EOF) {
+        if (a == '\n') {
+            count++;
+        }
     }
 
-    int number, num_lines = 3;
-    printf("Type %d numbers: ", num_lines);
-    for (int i = 0; i < num_lines; i++) {
-        scanf("%d", &number);
-        fprintf(file, "%d\n", number);
-    }
-
+    printf("line_acount：%d\n", count);
+    
     fclose(file);
     return 0;
 }
-

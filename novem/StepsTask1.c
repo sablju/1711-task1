@@ -42,7 +42,7 @@ int main() {
 typedef struct {
 	char date[11];
 	char time[6];
-	char steps[10];  // Changed back to char[]
+	int steps;
 } FITNESS_DATA;
     
     char record[21] = "2023-09-01,07:30,300";

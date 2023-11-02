@@ -17,7 +17,7 @@ typedef struct {
 // Inputs: character array representing a row; the delimiter character
 // Ouputs: date character array; time character array; steps character array
 void tokeniseRecord(const char *input, const char *delimiter,
-                    char *date, char *time, int *steps) {
+                    char *date, char *time, char *steps) {
     // Create a copy of the input string as strtok modifies the string
     char *inputCopy = strdup(input);
     
@@ -66,7 +66,7 @@ while (fgets(line_buffer, buffer_size, file) != NULL) {
         break;
     }
     tokeniseRecord(line_buffer, ",", date, time, steps);
-    printf("%s/%s/%d", date, time, steps);
+    printf("%s/%s/%ls", date, time, steps);
     line_count++;
 }
     fclose(file);

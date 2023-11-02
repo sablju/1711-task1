@@ -61,15 +61,14 @@ int stepsint;
     int buffer_size = 1024;
     char line_buffer[buffer_size];
      int line_count = 0;
-    while (fgets(line_buffer, buffer_size, file) != NULL) {
-        if (line_count >= 3) {
-            break;
-        }
-        printf("%s", line_buffer);
-        tokeniseRecord(line_buffer, ",", date, time, steps);
-        printf("%s/%s/%s\n", date, time, steps);
-        line_count++;
+while (fgets(line_buffer, buffer_size, file) != NULL) {
+    if (line_count >= 3) {
+        break;
     }
+    tokeniseRecord(line_buffer, ",", date, time, steps);
+    printf("%s/%s/%s\n", date, time, steps);
+    line_count++;
+}
     fclose(file);
     return 0;
 

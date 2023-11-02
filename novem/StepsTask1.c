@@ -57,6 +57,17 @@ int stepsint;
         perror("");
         return 1;
     }
+    int count = 0;
+    int a;
+    while((a = fgetc(file)) != EOF) {
+        if (a == '\n') {
+            count++;
+        }
+    }
+
+    printf("line_acount：%d\n", count);
+
+    rewind(file);  // Reset the file pointer to the beginning of the file
     
     int buffer_size = 1024;
     char line_buffer[buffer_size];
@@ -69,18 +80,8 @@ while (fgets(line_buffer, buffer_size, file) != NULL) {
     printf("%s/%s/%s", date, time, steps);
     line_count++;
 }
-  rewind(file);  // Reset the file pointer to the beginning of the file
-    
-    int count = 0;
-    int a;
-    while((a = fgetc(file)) != EOF) {
-        if (a == '\n') {
-            count++;
-        }
-    }
-
-    printf("line_acount：%d\n", count);
-    
+ 
+   
     fclose(file);
     return 0;
 }

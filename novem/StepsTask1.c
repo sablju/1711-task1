@@ -48,8 +48,8 @@ typedef struct {
     char record[21] = "2023-09-01,07:30,300";
     char date[11];
     char time[6];
-    char steps[10];  // Large enough to hold a typical step count as a string
-
+    int steps;
+	
 int stepsint;
     char filename[] = "FitnessData_2023.csv";
     FILE*file = fopen(filename,"r");

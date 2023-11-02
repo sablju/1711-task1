@@ -66,7 +66,7 @@ while (fgets(line_buffer, buffer_size, file) != NULL) {
         break;
     }
     tokeniseRecord(line_buffer, ",", date, time, steps);
-    printf("%s/%s/%s", date, time, steps);
+    printf("%s/%s/%d", date, time, steps);
     line_count++;
 }
     fclose(file);

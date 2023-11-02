@@ -17,7 +17,7 @@ typedef struct {
 // Inputs: character array representing a row; the delimiter character
 // Ouputs: date character array; time character array; steps character array
 void tokeniseRecord(const char *input, const char *delimiter,
-                    char *date, char *time, char *steps) {
+                    char *date, char *time, int *steps) {
     // Create a copy of the input string as strtok modifies the string
     char *inputCopy = strdup(input);
     
@@ -48,7 +48,7 @@ int main() {
     char record[21] = "2023-09-01,07:30,300";
     char date[11];
     char time[6];
-    char steps[10];  // Large enough to hold a typical step count as a string
+    int steps[10];  // Large enough to hold a typical step count as a string
 
 int stepsint;
     char filename[] = "FitnessData_2023.csv";

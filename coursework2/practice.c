@@ -1,17 +1,93 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "FitnessDataStruct.h"
 
-int main() {
-    int a;
-    a = 2;
+// Struct moved to header file
 
-    switch (a)
-    {
-        case 0:     printf ("Option 0 has been selected\n");
-        break;
+// Define any additional variables here
+// Global variables for filename and FITNESS_DATA array
 
-        case 1:     printf ("Option 1 has been selected\n");
-        break;
 
-        default:    printf ("A different option has been selected\n");
+// This is your helper function. Do not change it in any way.
+// Inputs: character array representing a row; the delimiter character
+// Ouputs: date character array; time character array; steps character array
+void tokeniseRecord(const char *input, const char *delimiter,
+                    char *date, char *time, char *steps) {
+    // Create a copy of the input string as strtok modifies the string
+    char *inputCopy = strdup(input);
+    
+    // Tokenize the copied string
+    char *token = strtok(inputCopy, delimiter);
+    if (token != NULL) {        strcpy(date, token);
     }
+    
+    token = strtok(NULL, delimiter);
+    if (token != NULL) {
+        strcpy(time, token);
+    }
+    
+    token = strtok(NULL, delimiter);
+    if (token != NULL) {
+        strcpy(steps, token);
+    }
+    
+    // Free the duplicated string
+    free(inputCopy);
+
+                    }
+
+
+// Complete the main function
+int main() {
+    char choice;
+    char filename[200];
+    int counter = 0;
+    float mean = 0; 
+
+    while (1) {
+        printf("Menu:\n");
+        printf("A: Specify the filename to import\n");
+        printf("B: Display the total number of records in the file\n");
+        printf("C: Find the date and time of the time slot with the least steps\n");
+        printf("D: Find the date and time of the time slot with the most steps\n");
+        printf("E: Find the average number of steps in all records\n");
+        printf("F: Find the longest continuous period with steps over 500\n");
+        printf("Q: Quit\n");
+        
+        printf("Please enter your choice: ");
+        scanf(" %c", &choice);
+        
+        switch(choice) {
+            case 'A':
+                printf("Enter the filename to import: ");
+                scanf("%s", filename);
+                break;
+            case 'B':
+                printf("Total number of records in the file: %d\n", counter);
+                break;
+            case 'C':
+                printf("Date and time of the time slot with the least steps\n");
+                // Add code to find the date and time of the time slot with the least steps
+                break;
+            case 'D':
+                printf("Date and time of the time slot with the most steps\n");
+                // Add code to find the date and time of the time slot with the most steps
+                break;
+            case 'E':
+                printf("Average number of steps in all records: %.2f\n", mean);
+                break;
+            case 'F':
+                printf("Longest continuous period with steps over 500\n");
+                // Add code to find the longest continuous period with steps over 500
+                break;
+            case 'Q':
+                printf("Exiting program...\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+                break;
+        }
+    }
+    return 0;
 }

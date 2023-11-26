@@ -56,7 +56,7 @@ int stepsint;
     if (file == NULL)  {
         perror("");
         return 1;
-    }
+    }                 
     int count = 0;
     int a;
     while((a = fgetc(file)) != EOF) {

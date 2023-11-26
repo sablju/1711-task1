@@ -39,12 +39,24 @@ void tokeniseRecord(const char *input, const char *delimiter,
 
 
 // Complete the main function
+typedef int Record;
+
 int main() {  
+    typedef struct {
+        time_t start;
+        time_t end;
+        int steps;
+    } TimeSlot; 
+    
     char choice;
     char filename[200];
-    int counter = 0;
+    int count = 0;
     float mean = 0; 
-
+    int total_steps = 0;
+    int a;
+    int record;
+    FILE *file;
+    
      while (1) {
         printf("Menu:\n");
         printf("A: Specify the filename to import\n");
@@ -63,13 +75,24 @@ int main() {
                 printf("Input filenmae: ");
                 scanf("%s", filename);
                 printf("File sucessfully loaded.\n");
+
+                file = fopen(filename, "r");
+                if (file == NULL) {
+                     perror("");
+                    return 1;
+                }
                 break;
-            case 'B':
-                printf("Total number of records in the file: %d\n", counter);
+            case 'B':                
+                while((a = fscanf(file,"%d",&record)) != EOF) {
+                    if (a == '\n') {
+                        count++;
+                        total_steps += record;
+                    }
+                }
+                printf("Total number of records in the file: %d\n", count); 
                 break;
             case 'C':
-                printf("Date and time of the time slot with the least steps\n");
-                // Add code to find the date and time of the time slot with the least steps
+            
                 break;
             case 'D':
                 printf("Date and time of the time slot with the most steps\n");
@@ -91,4 +114,4 @@ int main() {
         }
     }
     return 0;
-}
+}  

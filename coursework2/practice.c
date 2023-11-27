@@ -1,62 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "FitnessDataStruct.h"
+#include <limits.h>
+#define MAX_TIME_SLOTS 100
+#define buffer_size 256
 
-// Struct moved to header file
+// Define an appropriate struct
+struct TimeSlot {
+    char datetime[20];
+    int steps;
+};
 
-// Define any additional variables here
-// Global variables for filename and FITNESS_DATA array
-
-
-// This is your helper function. Do not change it in any way.
-// Inputs: character array representing a row; the delimiter character
-// Ouputs: date character array; time character array; steps character array
-void tokeniseRecord(const char *input, const char *delimiter,
-                    char *date, char *time, char *steps) {
-    // Create a copy of the input string as strtok modifies the string
-    char *inputCopy = strdup(input);
-    
-    // Tokenize the copied string
-    char *token = strtok(inputCopy, delimiter);
-    if (token != NULL) {        strcpy(date, token);
-    }
-    
-    token = strtok(NULL, delimiter);
-    if (token != NULL) {
-        strcpy(time, token);
-    }
-    
-    token = strtok(NULL, delimiter);
-    if (token != NULL) {
-        strcpy(steps, token);
-    }
-    
-    // Free the duplicated string
-    free(inputCopy);
-
-                    }
-
-
-// Complete the main function
-typedef int Record;
+// Helper function prototype
+void tokeniseRecord(const char *input, const char *delimiter, char *date, int *steps);
 
 int main() {  
-    typedef struct {
-        time_t start;
-        time_t end;
-        int steps;
-    } TimeSlot; 
-    
+    // Declare an array of struct TimeSlot
+    struct TimeSlot FITNESSDATA[MAX_TIME_SLOTS];
     char choice;
-    char filename[200];
+    char filename[buffer_size];
     int count = 0;
-    float mean = 0; 
-    int total_steps = 0;
-    int a;
-    int record;
-    FILE *file= NULL;
-    
+    FILE *file = NULL;
+    char line[buffer_size];
+
     while (1) {
         printf("Menu:\n");
         printf("A: Specify the filename to import\n");
@@ -78,47 +44,67 @@ int main() {
 
                 file = fopen(filename, "r");
                 if (file == NULL) {
-                     perror("");
+                    perror("Error opening file");
                     return 1;
                 }
                 break;
-            case 'B':                
-               if (file == NULL) {
+
+            case 'B':
+                if (file == NULL) {
                     printf("Please specify a filename first.\n");
                     break;
                 }
-                
-                while((a = fscanf(file,"%d",&record)) != EOF) {
-                    if (a == '\n') {
-                        count++;
-                        total_steps += record;
-                    }
+
+                // Reset count to 0 before reading the file
+                count = 0;
+
+                // Rewind the file to the beginning
+                rewind(file);
+
+                while (fgets(line, sizeof(line), file) != NULL && count < MAX_TIME_SLOTS) {
+                    char date[20];
+                    int steps;
+                    tokeniseRecord(line, ",", date, &steps);
+                    snprintf(FITNESSDATA[count].datetime, sizeof(FITNESSDATA[count].datetime), "%s", date);
+                    FITNESSDATA[count].steps = steps;
+                    count++;
                 }
+
                 printf("Total number of records in the file: %d\n", count);
                 break;
-
             case 'C':
-                printf("Date and time of the time slot with the least steps\n");
-                // Add code to find the date and time of the time slot with the least steps
+                if (count > 0) {
+                    int minSteps = INT_MAX;
+                    char minTimeSlot[20] = "";
+
+                    for (int i = 0; i < count; i++) {
+                        if (FITNESSDATA[i].steps < minSteps) {
+                            minSteps = FITNESSDATA[i].steps;
+                            strcpy(minTimeSlot, FITNESSDATA[i].datetime);
+                        }
+                    }
+
+                    if (minSteps != INT_MAX) {
+                        printf("Fewest steps: %s with %d steps\n", minTimeSlot, minSteps);
+                    } else {
+                        printf("No data available.\n");
+                    }
+                } else {
+                    printf("No data available.\n");
+                }
                 break;
-            case 'D':
-                printf("Date and time of the time slot with the most steps\n");
-                // Add code to find the date and time of the time slot with the most steps
-                break;
-            case 'E':
-                printf("Average number of steps in all records: %.2f\n", mean);
-                break;
-            case 'F':
-                printf("Longest continuous period with steps over 500\n");
-                // Add code to find the longest continuous period with steps over 500
-                break;
+
+            // Add other cases as needed
+
             case 'Q':
-                printf("Exiting program...\n");
-                exit(0);
+                if (file != NULL) {
+                    fclose(file);
+                }
+                return 0;
+
             default:
                 printf("Invalid choice. Please try again.\n");
-                break;
         }
     }
-    return 0;
 }
+

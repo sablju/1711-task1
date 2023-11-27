@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "FitnessDataStruct.h"
+#include "FitnessDataStruct.h" // Assuming the header file is in the same directory as your source file
 
 // Struct moved to header file
 
@@ -36,28 +36,41 @@ void tokeniseRecord(const char *input, const char *delimiter,
     free(inputCopy);
 
                     }
-
-
+// Define an appropriate struct
+struct TimeSlot {
+    char datetime[20];
+    int steps;
+};
+#define MAX_TIME_SLOTS 100
 // Complete the main function
 typedef int Record;
-
+#define MAX_TIME_SLOTS 100
 int main() {  
-    typedef struct {
-        time_t start;
-        time_t end;
-        int steps;
-    } TimeSlot; 
-    
+    // Declare an array of struct TimeSlot
+    struct TimeSlot FITNESSDATA[MAX_TIME_SLOTS];
     char choice;
     char filename[200];
     int count = 0;
-    float mean = 0; 
-    int total_steps = 0;
-    int a;
-    int record;
-    FILE *file;
-    
-     while (1) {
+    float mean = 0;     
+    int a;  
+    FILE *file= NULL;
+    char line[buffer_size];
+    char filename[buffer_size];
+
+    // get filename from the user
+    printf("Please enter the name of the data file: ");
+
+    // these lines read in a line from the stdin (where the user types)
+    // and then takes the actual string out of it
+    // this removes any spaces or newlines.
+    fgets(line, buffer_size, stdin);
+    sscanf(line, " %s ", filename);
+
+    char choice;
+    int counter = 0;
+    float mean = 0;
+
+    while (1) {
         printf("Menu:\n");
         printf("A: Specify the filename to import\n");
         printf("B: Display the total number of records in the file\n");
@@ -72,9 +85,9 @@ int main() {
         
         switch(choice) {
             case 'A':
-                printf("Input filenmae: ");
+                printf("Input filename: ");
                 scanf("%s", filename);
-                printf("File sucessfully loaded.\n");
+                printf("File successfully loaded.\n");
 
                 file = fopen(filename, "r");
                 if (file == NULL) {
@@ -83,13 +96,19 @@ int main() {
                 }
                 break;
             case 'B':                
-                while((a = fscanf(file,"%d",&record)) != EOF) {
-                    if (a == '\n') {
-                        count++;
-                        total_steps += record;
-                    }
+               if (file == NULL) {
+                    printf("Please specify a filename first.\n");
+                    break;
                 }
-                printf("Total number of records in the file: %d\n", count); 
+                char line[100];
+                while(fgets(line,100,file)) {
+                        count++;
+                    }
+                
+                    count++;
+                }
+
+                printf("line_acount：%d\n", count);
                 break;
             case 'C':
             

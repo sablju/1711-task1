@@ -64,29 +64,31 @@ int main() {
                 break;
 
             case 'C':
-                if (file == NULL) {
+               if (file == NULL) {
                     printf("Please specify a filename first.\n");
                     break;
                 }
-    
-                char line[100];
-                int min_steps =9999;
+
+                rewind(file);  // Rewind the file to the beginning
+                int min_steps = 9999;
                 char min_steps_time[100];
 
-                while(fgets(line, 100, file)) {
-        
-                char date[50], time[50];
-                int steps;
-                sscanf(line, "%s %s %d", date, time, &steps);
-                for(int a = 0; a< counte r; a++){
-                if(steps < min_steps) {
-                   min_steps = steps;
-                   sprintf(min_steps_time, "%s %s", date, time);
-                }
-            }
+                // Initialize count to 0
+                int count = 0;
+
+                while (fgets(line, 100, file)) {
+                    char date[50], time[50];
+                    int steps;
+                    sscanf(line, "%s %s %d", date, time, &steps);
+
+                    for (int a = 0; a < count; a++) {
+                        if (steps < min_steps) {
+                            min_steps = steps;
+                            sprintf(min_steps_time, "%s %s", date, time);
+                        }
+                    }
+
+                    count++;  // Increment count for each line
                 }
                 printf("Fewest steps:%s\n", min_steps_time);
                 break;
-        }
-    }
-}

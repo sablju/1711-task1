@@ -53,10 +53,7 @@ int main() {
     int count = 0;
     float mean = 0;     
     int a;  
-    FILE *file= NULL;
-    char line[buffer_size];
-    char filename[buffer_size];
-
+   
     // get filename from the user
     printf("Please enter the name of the data file: ");
 
@@ -111,8 +108,7 @@ int main() {
                 printf("line_acount：%d\n", count);
                 break;
             case 'C':
-            
-                break;
+                
             case 'D':
                 printf("Date and time of the time slot with the most steps\n");
                 // Add code to find the date and time of the time slot with the most steps

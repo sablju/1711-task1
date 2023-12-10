@@ -14,6 +14,7 @@ struct TimeSlot {
 
 // Helper function prototype
 void tokeniseRecord(const char *input, const char *delimiter, char *date, int *steps);
+int findMaxValue(const int array[], int size, int *maxIndex);
 
 int main() {
     // Declare an array of struct TimeSlot
@@ -92,3 +93,24 @@ int main() {
                 }
                 printf("Fewest steps:%s\n", min_steps_time);
                 break;
+                 case 'D':
+               
+                
+                break;
+            case 'E':
+                printf("Average number of steps in all records: %.2f\n", mean);
+                break;
+            case 'F':
+                printf("Longest continuous period with steps over 500\n");
+                // Add code to find the longest continuous period with steps over 500
+                break;
+            case 'Q':
+                printf("Exiting program...\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+                break;
+        }
+    }
+    return 0;
+}  

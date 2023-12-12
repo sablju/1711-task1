@@ -1,141 +1,157 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "FitnessDataStruct.h" // Assuming the header file is in the same directory as your source file
-
-// Struct moved to header file
-
-// Define any additional variables here
-// Global variables for filename and FITNESS_DATA array
-
-
-// This is your helper function. Do not change it in any way.
-// Inputs: character array representing a row; the delimiter character
-// Ouputs: date character array; time character array; steps character array
-void tokeniseRecord(const char *input, const char *delimiter,
-                    char *date, char *time, char *steps) {
-    // Create a copy of the input string as strtok modifies the string
-    char *inputCopy = strdup(input);
-    
-    // Tokenize the copied string
-    char *token = strtok(inputCopy, delimiter);
-    if (token != NULL) {        strcpy(date, token);
-    }
-    
-    token = strtok(NULL, delimiter);
-    if (token != NULL) {
-        strcpy(time, token);
-    }
-    
-    token = strtok(NULL, delimiter);
-    if (token != NULL) {
-        strcpy(steps, token);
-    }
-    
-    // Free the duplicated string
-    free(inputCopy);
-
-                    }
-// Define an appropriate struct
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <limits.h>
 
-#define MAX_TIME_SLOTS 100
+#define MAX_TIME_SLOTS 1000
 #define BUFFER_SIZE 256
 
 struct TimeSlot {
-    char datetime[20];
+    char date[11]; // YYYY-MM-DD
+    char time[6];  // HH:MM
     int steps;
 };
-
-void tokeniseRecord(const char *input, const char *delimiter, char *date, int *steps);
 
 int main() {
     struct TimeSlot FITNESSDATA[MAX_TIME_SLOTS];
     char filename[BUFFER_SIZE];
     FILE *file = NULL;
-    int count =0;
+    int count = 0;
+    char line[BUFFER_SIZE];
+
     while (1) {
         printf("Menu:\n");
         printf("A: Specify the filename to import\n");
         printf("B: Display the total number of records in the file\n");
         printf("C: Find the date and time of the time slot with the least steps\n");
         printf("D: Find the date and time of the time slot with the most steps\n");
-        printf("E: Find the average number of steps in all records\n");
-        printf("F: Find the longest continuous period with steps over 500\n");
         printf("Q: Quit\n");
-        
+
         printf("Please enter your choice: ");
+        char choice;
         scanf(" %c", &choice);
-        
-        switch(choice) {
+
+        switch (choice) {
             case 'A':
                 printf("Input filename: ");
                 scanf("%s", filename);
-                printf("File successfully loaded.\n");
-
                 file = fopen(filename, "r");
                 if (file == NULL) {
-                     perror("");
+                    perror("Error opening file");
                     return 1;
                 }
-                break;
-            case 'B':                
-               if (file == NULL) {
-                    printf("Please specify a filename first.\n");
-                    break;
-                }
-                char line[100];
-                while(fgets(line,100,file)) {
-                        count++;
-                    }
-                
+                count = 0;
+                while (fgets(line, BUFFER_SIZE, file) != NULL) {
+                    sscanf(line, "%[^,],%[^,],%d", FITNESSDATA[count].date, FITNESSDATA[count].time, &FITNESSDATA[count].steps);
                     count++;
-                }
-
-                printf("line_acount：%d\n", count);
-                break;
-            case 'C':
-                if (file == NULL) {
-                    printf("Please specify a filename first.\n");
-                    break;
-                }
-
-                rewind(file);
-                int min_steps = INT_MAX;
-                char min_steps_time[BUFFER_SIZE];
-               
-                while (fgets(min_steps_time, sizeof(min_steps_time), file)) {
-                    char date[50], time[50];
-                    int steps;
-                    sscanf(min_steps_time, "%s %s %d", date, time, &steps);
-
-                    if (steps < min_steps) {
-                        min_steps = steps;
-                        strcpy(min_steps_time, min_steps_time);  // Copy the entire line
-                        count++;
+                    if (count >= MAX_TIME_SLOTS) {
+                        break;
                     }
                 }
+                fclose(file);
+                printf("File successfully loaded.\n");
+                break;
 
-                if (count > 0) {
-                    printf("Fewest steps: %d at %s\n", min_steps, min_steps_time);
+            case 'B':
+                printf("Total number of records in the file: %d\n", count);
+                break;
+
+            case 'C':
+                if (count == 0) {
+                    printf("No data available. Please load a file first.\n");
+                    break;
+                }
+                int min_steps = INT_MAX;
+                int min_index = -1;
+                for (int i = 0; i < count; i++) {
+                    if (FITNESSDATA[i].steps < min_steps) {
+                        min_steps = FITNESSDATA[i].steps;
+                        min_index = i;
+                    }
+                }
+                if (min_index != -1) {
+                    printf("Fewest steps:%s,%s，%d\n", FITNESSDATA[min_index].date, FITNESSDATA[min_index].time, min_steps);
                 } else {
-                    printf("No data found in the file.\n");
+                    printf("No data found.\n");
                 }
                 break;
 
             case 'D':
-                printf("Date and time of the time slot with the most steps\n");
-                // Add code to find the date and time of the time slot with the most steps
+                if (count == 0) {
+                    printf("No data available. Please load a file first.\n");
+                    break;
+                }
+                int max_steps = INT_MIN;
+                int max_index = -1;
+                for (int i = 0; i < count; i++) {
+                    if (FITNESSDATA[i].steps > max_steps) {
+                        max_steps = FITNESSDATA[i].steps;
+                        max_index = i;
+                    }
+                } 
+                if (max_index != -1) {
+                    printf("Most steps:%s,%s，%d\n", FITNESSDATA[max_index].date, FITNESSDATA[max_index].time, max_steps);
+                } else {
+                    printf("No data found.\n");
+                }
                 break;
+
             case 'E':
-                printf("Average number of steps in all records: %.2f\n", mean);
+                if (count == 0) {
+                    printf("No data available. Please load a file first.\n");
+                    break;
+                }
+                int total_steps = 0;
+                for (int i = 0; i < count; i++) {
+                    total_steps += FITNESSDATA[i].steps;
+                }
+                double average_steps = (double)total_steps / count;
+                printf("Average steps: %.2f\n", average_steps);
                 break;
-            case 'F':
-                printf("Longest continuous period with steps over 500\n");
-                // Add code to find the longest continuous period with steps over 500
+            case 'F':   
+                if (count == 0) {
+                    printf("No data available. Please load a file first.\n");
+                    break;
+                }
+
+                int longest_duration = 0;
+                int current_duration = 0;
+                int start_index = -1;
+                int end_index = -1;
+                int longest_start_index = -1;
+                int longest_end_index = -1;
+
+                for (int i = 0; i < count; i++) {
+                    if (FITNESSDATA[i].steps > 500) {
+                        if (current_duration == 0) {
+                            start_index = i;
+                        }
+                        current_duration++;
+                        end_index = i;
+                    } else {
+                        if (current_duration > longest_duration) {
+                            longest_duration = current_duration;
+                            longest_start_index = start_index;
+                            longest_end_index = end_index;
+                        }
+                        current_duration = 0;
+                    }
+                }
+
+                // Check the last sequence
+                if (current_duration > longest_duration) {
+                    longest_duration = current_duration;
+                    longest_start_index = start_index;
+                    longest_end_index = end_index;
+                }
+
+                if (longest_start_index != -1 && longest_end_index != -1) {
+                    printf("Longest continuous period over 500 steps: From %s,%s to %s,%s\n",
+                        FITNESSDATA[longest_start_index].date, FITNESSDATA[longest_start_index].time,
+                        FITNESSDATA[longest_end_index].date, FITNESSDATA[longest_end_index].time);
+                } else {
+                    printf("No continuous period over 500 steps found.\n");
+                }
                 break;
             case 'Q':
                 printf("Exiting program...\n");

@@ -3,26 +3,29 @@
 #include <string.h>
 #include <limits.h>
 
-#define MAX_TIME_SLOTS 100
+#define MAX_TIME_SLOTS 1000
 #define BUFFER_SIZE 256
 
 struct TimeSlot {
-    char datetime[20];
+    char date[11]; // YYYY-MM-DD
+    char time[6];  // HH:MM
     int steps;
 };
-
-void tokeniseRecord(const char *input, const char *delimiter, char *date, int *steps);
 
 int main() {
     struct TimeSlot FITNESSDATA[MAX_TIME_SLOTS];
     char filename[BUFFER_SIZE];
     FILE *file = NULL;
-    int count =0;
+    int count = 0;
+    char line[BUFFER_SIZE];
+
     while (1) {
         printf("Menu:\n");
         printf("A: Specify the filename to import\n");
         printf("B: Display the total number of records in the file\n");
         printf("C: Find the date and time of the time slot with the least steps\n");
+        printf("D: Find the date and time of the time slot with the most steps\n");
+        printf("E: Display the average number of steps\n");
         printf("Q: Quit\n");
 
         printf("Please enter your choice: ");
@@ -38,58 +41,77 @@ int main() {
                     perror("Error opening file");
                     return 1;
                 }
+                count = 0;
+                while (fgets(line, BUFFER_SIZE, file) != NULL) {
+                    sscanf(line, "%[^,],%[^,],%d", FITNESSDATA[count].date, FITNESSDATA[count].time, &FITNESSDATA[count].steps);
+                    count++;
+                    if (count >= MAX_TIME_SLOTS) {
+                        break;
+                    }
+                }
+                fclose(file);
                 printf("File successfully loaded.\n");
                 break;
 
             case 'B':
-                if (file == NULL) {
-                    printf("Please specify a filename first.\n");
-                    break;
-                }
-
-                rewind(file);
-                char line[BUFFER_SIZE];
-                while (fgets(line, BUFFER_SIZE, file) != NULL) {
-                    count++;
-                }
-
                 printf("Total number of records in the file: %d\n", count);
                 break;
 
             case 'C':
-                if (file == NULL) {
-                    printf("Please specify a filename first.\n");
+                if (count == 0) {
+                    printf("No data available. Please load a file first.\n");
                     break;
                 }
-
-                rewind(file);
                 int min_steps = INT_MAX;
-                char min_steps_time[BUFFER_SIZE];
-               
-                while (fgets(min_steps_time, sizeof(min_steps_time), file)) {
-                    char date[50], time[50];
-                    int steps;
-                    sscanf(min_steps_time, "%s %s %d", date, time, &steps);
-
-                    if (steps < min_steps) {
-                        min_steps = steps;
-                        strcpy(min_steps_time, min_steps_time);  // Copy the entire line
-                        count++;
+                int min_index = -1;
+                for (int i = 0; i < count; i++) {
+                    if (FITNESSDATA[i].steps < min_steps) {
+                        min_steps = FITNESSDATA[i].steps;
+                        min_index = i;
                     }
                 }
-
-                if (count > 0) {
-                    printf("Fewest steps: %d at %s\n", min_steps, min_steps_time);
+                if (min_index != -1) {
+                    printf("%s,%s，%d\n", FITNESSDATA[min_index].date, FITNESSDATA[min_index].time, min_steps);
                 } else {
-                    printf("No data found in the file.\n");
+                    printf("No data found.\n");
                 }
+                break;
+
+            case 'D':
+                if (count == 0) {
+                    printf("No data available. Please load a file first.\n");
+                    break;
+                }
+                int max_steps = INT_MIN;
+                int max_index = -1;
+                for (int i = 0; i < count; i++) {
+                    if (FITNESSDATA[i].steps > max_steps) {
+                        max_steps = FITNESSDATA[i].steps;
+                        max_index = i;
+                    }
+                } 
+                if (max_index != -1) {
+                    printf("%s,%s，%d\n", FITNESSDATA[max_index].date, FITNESSDATA[max_index].time, max_steps);
+                } else {
+                    printf("No data found.\n");
+                }
+                break;
+
+            case 'E':
+                if (count == 0) {
+                    printf("No data available. Please load a file first.\n");
+                    break;
+                }
+                int total_steps = 0;
+                for (int i = 0; i < count; i++) {
+                    total_steps += FITNESSDATA[i].steps;
+                }
+                double average_steps = (double)total_steps / count;
+                printf("Average steps: %.2f\n", average_steps);
                 break;
 
             case 'Q':
                 printf("Exiting program...\n");
-                if (file != NULL) {
-                    fclose(file);
-                }
                 exit(0);
 
             default:
@@ -97,6 +119,5 @@ int main() {
                 break;
         }
     }
-
     return 0;
 }

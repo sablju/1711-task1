@@ -30,8 +30,10 @@ int main() {
     int numRecords = 0;
     char line[520];
 
-    while (fgets(line, sizeof(line), inputFile))
-        tokeniseRecord(line, ',', records[numRecords].date, records[numRecords].time, &records[numRecords++].steps);
+    while (fgets(line, sizeof(line), inputFile)) {
+        tokeniseRecord(line, ',', records[numRecords].date, records[numRecords].time, &records[numRecords].steps);
+        if(strlen(records[numRecords].date) > 0) numRecords++;
+    }
 
     fclose(inputFile);
 
@@ -50,12 +52,20 @@ void tokeniseRecord(char *record, char delimiter, char *date, char *time, int *s
     char *ptr = strtok(record, &delimiter);
     if (ptr) {
         strcpy(date, ptr);
-        ptr = strtok(NULL, &delimiter);
-        if (ptr) {
-            strcpy(time, ptr);
-            ptr = strtok(NULL, &delimiter);
-            if (ptr) *steps = atoi(ptr);
-        }
+    } else {
+        *date = '\0';
+    }
+    ptr = strtok(NULL, &delimiter);
+    if (ptr) {
+        strcpy(time, ptr);
+    } else {
+        *time = '\0';
+    }
+    ptr = strtok(NULL, &delimiter);
+    if (ptr) {
+        *steps = atoi(ptr);
+    } else {
+        *steps = 0;
     }
 }
 

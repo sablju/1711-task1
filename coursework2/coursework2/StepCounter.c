@@ -7,10 +7,13 @@
 #define BUFFER_SIZE 256
 
 struct TimeSlot {
-    char date[11]; // YYYY-MM-DD
-    char time[6];  // HH:MM
+    char date[11];
+    char time[6];
     int steps;
 };
+
+// Assuming tokeniseRecord is implemented correctly
+void tokeniseRecord(const char *input, const char *delimiter, char *date, char *time, char *steps);
 
 int main() {
     struct TimeSlot FITNESSDATA[MAX_TIME_SLOTS];
@@ -18,6 +21,7 @@ int main() {
     FILE *file = NULL;
     int count = 0;
     char line[BUFFER_SIZE];
+    int totalSteps = 0; // For calculating mean
 
     while (1) {
         printf("Menu:\n");
@@ -25,6 +29,7 @@ int main() {
         printf("B: Display the total number of records in the file\n");
         printf("C: Find the date and time of the time slot with the least steps\n");
         printf("D: Find the date and time of the time slot with the most steps\n");
+        printf("E: Calculate and display the mean steps\n"); // Added option for mean steps
         printf("Q: Quit\n");
 
         printf("Please enter your choice: ");
@@ -41,11 +46,16 @@ int main() {
                     return 1;
                 }
                 count = 0;
+                totalSteps = 0; // Reset total steps when new file is loaded
                 while (fgets(line, BUFFER_SIZE, file) != NULL) {
-                    sscanf(line, "%[^,],%[^,],%d", FITNESSDATA[count].date, FITNESSDATA[count].time, &FITNESSDATA[count].steps);
-                    count++;
-                    if (count >= MAX_TIME_SLOTS) {
-                        break;
+                    // Ensure the line is valid before processing
+                    if (strlen(line) > 1) {
+                        sscanf(line, "%[^,],%[^,],%d", FITNESSDATA[count].date, FITNESSDATA[count].time, &FITNESSDATA[count].steps);
+                        totalSteps += FITNESSDATA[count].steps; // Accumulate steps
+                        count++;
+                        if (count >= MAX_TIME_SLOTS) {
+                            break;
+                        }
                     }
                 }
                 fclose(file);
@@ -90,24 +100,21 @@ int main() {
                     }
                 } 
                 if (max_index != -1) {
-                    printf("Most steps:%s,%s，%d\n", FITNESSDATA[max_index].date, FITNESSDATA[max_index].time, max_steps);
+                    printf("Most steps:%s,%s,%d\n", FITNESSDATA[max_index].date, FITNESSDATA[max_index].time, max_steps);
                 } else {
                     printf("No data found.\n");
                 }
                 break;
 
-            case 'E':
-                if (count == 0) {
+              case 'E': // New case for mean steps
+                if (count > 0) {
+                    int meanSteps = (int)((float)totalSteps / count + 0.5); // Calculate mean and round
+                    printf("Mean steps: %d\n", meanSteps);
+                } else {
                     printf("No data available. Please load a file first.\n");
-                    break;
                 }
-                int total_steps = 0;
-                for (int i = 0; i < count; i++) {
-                    total_steps += FITNESSDATA[i].steps;
-                }
-                double average_steps = (double)total_steps / count;
-                printf("Average steps: %.2f\n", average_steps);
                 break;
+
             case 'F':   
                 if (count == 0) {
                     printf("No data available. Please load a file first.\n");
@@ -163,3 +170,4 @@ int main() {
     }
     return 0;
 }  
+  

@@ -4,50 +4,41 @@
 #include <limits.h>
 
 #define MAX_TIME_SLOTS 100
-#define buffer_size 256
+#define BUFFER_SIZE 256
 
-// Define an appropriate struct
 struct TimeSlot {
     char datetime[20];
     int steps;
 };
 
-// Helper function prototype
 void tokeniseRecord(const char *input, const char *delimiter, char *date, int *steps);
-int findMaxValue(const int array[], int size, int *maxIndex);
 
 int main() {
-    // Declare an array of struct TimeSlot
     struct TimeSlot FITNESSDATA[MAX_TIME_SLOTS];
-    char choice;
-    char filename[buffer_size];
+    char filename[BUFFER_SIZE];
     FILE *file = NULL;
-    char line[buffer_size];
-
+    int count =0;
     while (1) {
         printf("Menu:\n");
         printf("A: Specify the filename to import\n");
         printf("B: Display the total number of records in the file\n");
         printf("C: Find the date and time of the time slot with the least steps\n");
-        printf("D: Find the date and time of the time slot with the most steps\n");
-        printf("E: Find the average number of steps in all records\n");
-        printf("F: Find the longest continuous period with steps over 500\n");
         printf("Q: Quit\n");
 
         printf("Please enter your choice: ");
+        char choice;
         scanf(" %c", &choice);
 
         switch (choice) {
             case 'A':
                 printf("Input filename: ");
                 scanf("%s", filename);
-                printf("File successfully loaded.\n");
-
                 file = fopen(filename, "r");
                 if (file == NULL) {
                     perror("Error opening file");
                     return 1;
                 }
+                printf("File successfully loaded.\n");
                 break;
 
             case 'B':
@@ -56,8 +47,9 @@ int main() {
                     break;
                 }
 
-                int count = 0;  // Initialize count
-                while (fgets(line, buffer_size, file) != NULL) {
+                rewind(file);
+                char line[BUFFER_SIZE];
+                while (fgets(line, BUFFER_SIZE, file) != NULL) {
                     count++;
                 }
 
@@ -65,52 +57,46 @@ int main() {
                 break;
 
             case 'C':
-               if (file == NULL) {
+                if (file == NULL) {
                     printf("Please specify a filename first.\n");
                     break;
                 }
 
-                rewind(file);  // Rewind the file to the beginning
-                int min_steps = 9999;
-                char min_steps_time[100];
-
-                // Initialize count to 0
-                int count = 0;
-
-                while (fgets(line, 100, file)) {
+                rewind(file);
+                int min_steps = INT_MAX;
+                char min_steps_time[BUFFER_SIZE];
+               
+                while (fgets(min_steps_time, sizeof(min_steps_time), file)) {
                     char date[50], time[50];
                     int steps;
-                    sscanf(line, "%s %s %d", date, time, &steps);
+                    sscanf(min_steps_time, "%s %s %d", date, time, &steps);
 
-                    for (int a = 0; a < count; a++) {
-                        if (steps < min_steps) {
-                            min_steps = steps;
-                            sprintf(min_steps_time, "%s %s", date, time);
-                        }
+                    if (steps < min_steps) {
+                        min_steps = steps;
+                        strcpy(min_steps_time, min_steps_time);  // Copy the entire line
+                        count++;
                     }
-
-                    count++;  // Increment count for each line
                 }
-                printf("Fewest steps:%s\n", min_steps_time);
+
+                if (count > 0) {
+                    printf("Fewest steps: %d at %s\n", min_steps, min_steps_time);
+                } else {
+                    printf("No data found in the file.\n");
+                }
                 break;
-                 case 'D':
-               
-                
-                break;
-            case 'E':
-                printf("Average number of steps in all records: %.2f\n", mean);
-                break;
-            case 'F':
-                printf("Longest continuous period with steps over 500\n");
-                // Add code to find the longest continuous period with steps over 500
-                break;
+
             case 'Q':
                 printf("Exiting program...\n");
+                if (file != NULL) {
+                    fclose(file);
+                }
                 exit(0);
+
             default:
                 printf("Invalid choice. Please try again.\n");
                 break;
         }
     }
+
     return 0;
-}  
+}
